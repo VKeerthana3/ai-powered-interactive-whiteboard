@@ -1,0 +1,84 @@
+<%- include('head')%>
+<body>
+
+   
+ 
+    <div class="app">
+       
+        <div id="left">
+            <h1>Simple Quiz</h1>
+            <div class="launch-time">
+               
+                
+                <div>
+                    <p id="minutes">00</p> 
+                   
+                   
+                </div>
+
+                <div>
+                    <p>:</p>
+                </div>
+                <div>
+                    <p id="seconds">00</p>
+                    <span></span>
+                    
+                </div>
+            </div>
+            
+           
+            <div class="quiz">
+                <h2 id="question">Question</h2>
+        
+                <div id="answer-buttons">
+                    <button id="btn-one" class="btn">Answer 1</button>
+                    <button id="two" class="btn">Answer 2</button>
+                    <button id="three" class="btn">Answer 3</button>
+                    <button id="four" class="btn">Answer 4</button>
+                </div>
+
+                <button id="next-btn">Next</button>
+                <button id="submit-quiz">Submit</a>
+            </div>
+        </div>
+        <div id="right">
+            <h2>Chat Bot</h2>
+            
+            <div id="app">
+                <div id="chat-container">
+        
+                </div>
+                <form id="chatgpt">
+                    <textarea name="prompt" rows="1" cols="1" placeholder="ask..."></textarea>
+                    <button class="btn" type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+        
+        
+    </div>
+        
+            <script src="/socket.io/socket.io.js"></script>
+
+            <script> //var roomValue = group.group;
+                window.room = '<%= group.group%>';
+                console.log('window room set ', window.room);           
+                
+                window.score = '<%= group.quizScore %>';
+                console.log('window score set ', window.score);
+
+                window.id = '<%= group._id%>'
+                console.log('window id set ', window.id);
+
+                
+                </script>
+                
+            <script type="text/javascript" src="/script.js"></script>
+
+            <script>
+ 
+
+</script>
+
+</body>
+</html>

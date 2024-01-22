@@ -1,0 +1,227 @@
+<%- include('head')%>
+<body>
+<form id="myForm">
+    <h1>Describe an image</h1>
+    <div>
+        <input type="text" id="prompt" placeholder="Enter Text" />
+      </div>
+    <div>
+        <select name="size" id="size">
+            <option value="small">Small</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Large</option>
+        </select>
+    </div>
+    <button type="submit" class="btn">Generate</button>
+    
+</form>
+
+
+<section class="image">
+    <div class="image-container">
+        <h2 class="msg"></h2>
+        <img src="" alt="" id="image">
+    </div>
+
+    <button  class="btn" id="done" >Done</button>
+
+    <button class="btn saveImageForm" id="save">Save</button>
+    
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    console.log('story.ejs');
+    //var socket = io('http://localhost:3000');
+    var socket = io('https://cryptic-anchorage-13951.herokuapp.com');
+
+    let room = '<%= group.group %>'
+
+    let urls = [];
+    let imageUrl = "";
+
+    document.querySelector("#myForm").addEventListener("submit", onSubmit);
+    document.querySelector("#save").style.display = "none";
+    document.getElementById("done").style.display = "none";
+
+
+function onSubmit(e){
+   
+    e.preventDefault();
+
+    document.querySelector('.msg').textContent = "";
+    document.querySelector('#image').src = "";
+
+    let pValue = document.getElementById("prompt").value;
+    let sValue = document.getElementById("size").value;
+
+    const prompt = document.getElementById("prompt").value;
+    const size = document.getElementById("size").value;
+
+    if(prompt === ""){
+        alert("please add some text");
+        return;
+    }
+    myData = {
+        pId: "prompt",
+        sId: "size",
+        pValue,
+        sValue
+    }
+    socket.emit('formSubmit', (myData));
+
+    generateImageRequest(prompt, size)
+}
+
+
+
+async function generateImageRequest(prompt, size){
+    try{
+
+        const response = await fetch('https://cryptic-anchorage-13951.herokuapp.com', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt, size
+            })
+        });
+
+        if(!response.ok){
+            throw new Error('that image could not be generated');
+        }
+
+        const data = await response.json();
+
+        imageUrl = data.data;
+
+
+        document.querySelector('#image').src = imageUrl;
+        document.querySelector("#save").style.display = "block";
+        document.getElementById("done").style.display = "block";
+
+        let sendData = {
+            imageUrl,
+            id: "image",
+            saveId: "save",
+            doneId: "done",
+            room: '<%= group.group%>'
+       }
+
+       socket.emit('generateImage', sendData);
+
+       console.log('Imgae url in generate function ', imageUrl);
+
+       return imageUrl;
+
+
+    } catch (error) {
+        document.querySelector('.msg').textContent = error;
+    }
+}
+
+document.querySelector("#save").addEventListener("click", async () => {
+    console.log('image url is ', imageUrl)
+   
+    const saveResponse = await fetch('/rooms/<%= group._id%>/urls', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Headers': '*'
+        },
+        body: JSON.stringify({
+            imageUrl
+        })
+       })
+
+    let data = {
+        saveId: "save",
+        room: '<%= group.group%>'
+       }
+
+    socket.emit('savedImages', data);
+
+    if(!saveResponse.ok){
+            throw new Error('image could not be saved');
+       }
+
+    document.querySelector("#save").style.display = "none";    
+    document.getElementById("prompt").value = "";
+    document.getElementById("image").src = "";
+       
+});
+
+document.getElementById("done").addEventListener("click", showUrl)
+
+function showUrl(){
+    let link = "/rooms/<%= group._id%>/urls";
+    let data = {
+        link,
+
+        room: '<%= group.group %>'
+    }
+    console.log('the data here is ', data);
+    socket.emit('showUrl', data)
+    window.location = link;
+   
+}
+
+socket.on('savedImages', (data) => {
+    let saveButton = document.getElementById(data.saveId);
+    document.querySelector("#save").style.display = "none";
+    document.getElementById("prompt").value = "";
+    document.getElementById("image").src = "";
+})
+
+/*
+async function reviewUrls(){
+    try{
+
+const response = await fetch('/rooms/<%= group._id%>/urls', {
+    method: 'GET',
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
+if(!response.ok){
+    throw new Error('that image could not be generated');
+}
+
+} catch (error) {
+        document.querySelector('.msg').textContent = error;
+    }
+}
+*/
+
+
+socket.emit('join', {room}); 
+
+socket.on('showingUrl', data => {
+    window.location = data.link;
+})
+    
+
+socket.on('fillDetails', (data) => {
+    console.log('broadcasted');
+
+    let myPrompt = document.getElementById(data.pId);
+    let mySize = document.getElementById(data.sId);
+
+    myPrompt.value = data.pValue;
+    mySize.value = data.sValue;
+   
+})
+
+socket.on('transferImage', (sendData) => {
+    document.getElementById(sendData.id).src = sendData.imageUrl;
+    document.getElementById(sendData.saveId).style.display = "block";
+    document.getElementById(sendData.doneId).style.display = "block";     
+})
+</script>
+
+
+</body>
+</html>

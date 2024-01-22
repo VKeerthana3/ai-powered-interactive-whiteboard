@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <link rel="stylesheet" href="/bootstrap.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <script src="/jquery-3.6.4.min.js"></script>
+    <script src="/bootstrap.min.js"></script>
+<!--    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">-->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css"/>
+
+    <title>Interactive Whiteboard</title>
+
+</head>
+<body>
+
+
+
+      <nav>
+       
+        <ul>
+            <% if (currentUser) { %>
+                <% if (currentUser.userType === "professor") { %>
+                    <li> <a href="/teacher">Home</a></li>
+                <% } %>
+            <% } else { %>
+                <li> <a href="/">Home</a></li>
+            <% } %>
+            <li> <a href="/board">Drawing</a></li>
+            
+            <% if (currentUser) { %>
+
+            <% if (currentUser.userType === "student") { %>
+            <li>
+                <a id="aboutBtn" href="/rooms">Group Activity</a>
+            </li>
+            <% } %>
+            <% } %>
+
+            <% if (!currentUser) { %>
+            <li>
+                <a id="loginBtn" href="/login">Login</a>
+            </li>
+            <li>
+                <a  href="/register">Sign up</a>
+            </li>
+            <% } else { %>
+            <li>
+                <a id="logoutBtn" href="/logout">Logout</a>
+            </li>
+           
+            <% } %> 
+     
+        </ul>
+      </nav>
+
+<main>
+    <section class="intro">
+        <h1>Welcome to the Interactive Whiteboard!</h1>
+        <p>
+            This application offers an intuitive and user-friendly platform for
+            users to collaborate and work on digital whiteboards in real-time.
+            Share your ideas, brainstorm, sketch, and communicate with your team
+            seamlessly. Sign in to start using the Interactive Whiteboard now!
+        </p>
+    </section>
+</main>
+
+</body>
+</html>

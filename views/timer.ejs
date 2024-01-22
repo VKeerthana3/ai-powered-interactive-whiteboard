@@ -1,0 +1,45 @@
+<%- include('head')%>
+<body>
+
+    <div id="timeUp">
+        <h3>You've run out of time</h3>
+        <button class="btn" id="round2">ROUND 2</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        //var socket = io('http://localhost:3000');
+        var socket = io('https://cryptic-anchorage-13951.herokuapp.com');
+
+        socket.emit('join', {room: '<%= group.group%>'});  
+
+        console.log('story script')
+
+        let nextRound = document.getElementById("round2");
+        nextRound.addEventListener("click", nextRoundFunction);
+
+        function nextRoundFunction(){
+
+            let data = {
+                room: '<%= group.group%>',
+                nextId: "round2"
+            }
+            socket.emit('nextRound', data)
+            location.href = "/rooms/<%= group._id%>/story";
+        }
+
+
+        socket.on('nextRound', (data) => {
+            let nextButton = document.getElementById(data.nextId);
+            nextButton.style.display = "none";
+            location.href = "/rooms/<%= group._id%>/story"
+        })
+
+    </script>
+
+    <script src="script.js"></script>
+
+   
+</body>
+</html>
